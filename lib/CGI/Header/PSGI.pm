@@ -1,13 +1,12 @@
 package CGI::Header::PSGI;
-use strict;
-use warnings;
+use 5.008_009;
 use CGI::Header;
 use Carp qw/croak/;
 use Role::Tiny;
 
-requires qw( crlf cache charset self_url );
+our $VERSION = '0.02';
 
-our $VERSION = '0.01';
+requires qw( cache charset crlf self_url );
 
 sub psgi_header {
     my $self     = shift;
@@ -90,9 +89,11 @@ CGI::Header::PSGI - Role for generating PSGI response headers
 
   sub crlf { $CGI::CRLF }
 
+  # psgi_header() and psgi_redirect() get imported
+
 =head1 VERSION
 
-This document refers to CGI::Header::PSGI 0.01.
+This document refers to CGI::Header::PSGI 0.02.
 
 =head1 DESCRIPTION
 
