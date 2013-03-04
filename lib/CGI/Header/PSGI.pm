@@ -4,7 +4,7 @@ use CGI::Header;
 use Carp qw/croak/;
 use Role::Tiny;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 requires qw( cache charset crlf self_url );
 
@@ -17,14 +17,14 @@ sub psgi_header {
     unshift @args, '-type' if @args == 1;
 
     my $header = CGI::Header->new(
-        -charset => $self->charset,
+        -query => $self,
         @args,
     );
 
     $header->nph( 0 );
     $header->expires( 'now' ) if $no_cache and !$header->exists('Expires');
 
-    if ( ($no_cache or $self->cache) and !$header->exists('Pragma') ) {
+    if ( $no_cache and !$header->exists('Pragma') ) {
         $header->set( 'Pragma' => 'no-cache' );
     }
 
@@ -93,7 +93,7 @@ CGI::Header::PSGI - Role for generating PSGI response headers
 
 =head1 VERSION
 
-This document refers to CGI::Header::PSGI 0.02.
+This document refers to CGI::Header::PSGI 0.03.
 
 =head1 DESCRIPTION
 
