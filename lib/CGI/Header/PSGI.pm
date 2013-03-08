@@ -1,31 +1,52 @@
 package CGI::Header::PSGI;
 use 5.008_009;
 use CGI::Header;
+use CGI::Header::Redirect;
 use Carp qw/croak/;
 use Role::Tiny;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 requires qw( cache charset crlf self_url );
 
 sub psgi_header {
-    my $self     = shift;
-    my @args     = ref $_[0] eq 'HASH' ? %{ $_[0] } : @_;
-    my $crlf     = $self->crlf;
-    my $no_cache = $self->can('no_cache') && $self->no_cache;
+    my $self = shift;
+    my @args = ref $_[0] eq 'HASH' ? %{ $_[0] } : @_;
 
     unshift @args, '-type' if @args == 1;
 
-    my $header = CGI::Header->new(
+    return $self->_psgi_header(
+        header_props => \@args,
+        handler => 'CGI::Header',
+    );
+}
+
+sub psgi_redirect {
+    my $self = shift;
+    my @args = ref $_[0] eq 'HASH' ? %{ $_[0] } : @_;
+
+    unshift @args, '-location' if @args == 1;
+
+    return $self->_psgi_header(
+        header_props => \@args,
+        handler => 'CGI::Header::Redirect',
+    );
+}
+
+sub _psgi_header {
+    my $self = shift;
+    my %args = @_;
+    my $crlf = $self->crlf;
+
+    my $header = $args{handler}->new(
+        @{ $args{header_props} },
         -query => $self,
-        @args,
     );
 
-    $header->nph( 0 );
-    $header->expires( 'now' ) if $no_cache and !$header->exists('Expires');
-
-    if ( $no_cache and !$header->exists('Pragma') ) {
-        $header->set( 'Pragma' => 'no-cache' );
+    # for CGI::Simple
+    if ( $self->can('no_cache') and $self->no_cache ) {
+        $header->expires( 'now' ) if !$header->exists('Expires');
+        $header->set( 'Pragma' => 'no-cache' ) if !$header->exists('Pragma');
     }
 
     my $status = $header->delete('Status') || '200';
@@ -58,20 +79,6 @@ sub psgi_header {
     return $status, \@headers;
 }
 
-sub psgi_redirect {
-    my $self = shift;
-    my @args = ref $_[0] eq 'HASH' ? %{ $_[0] } : @_;
-
-    unshift @args, '-location' if @args == 1;
-
-    return $self->psgi_header(
-        -location => $self->self_url,
-        -status => '302',
-        -type => q{},
-        @args,
-    );
-}
-
 1;
 
 __END__
@@ -93,7 +100,7 @@ CGI::Header::PSGI - Role for generating PSGI response headers
 
 =head1 VERSION
 
-This document refers to CGI::Header::PSGI 0.03.
+This document refers to CGI::Header::PSGI 0.04.
 
 =head1 DESCRIPTION
 
