@@ -1,5 +1,5 @@
 ---
-abstract: 'Role for generating PSGI response headers'
+abstract: 'Generate PSGI-compatible response header arrayref'
 author:
   - 'Ryo Anazawa (anazawa@cpan.org)'
 build_requires:
@@ -24,11 +24,11 @@ no_index:
     - t
     - xt
 requires:
-  CGI::Header: 0.32
+  CGI::Header: 0.45
   Carp: 1.10
-  Role::Tiny: 0
+  parent: 0
   perl: 5.8.9
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/anazawa/p5-CGI-Header-PSGI
-version: 0.05
+version: 0.10
