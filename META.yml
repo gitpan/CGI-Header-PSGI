@@ -24,11 +24,11 @@ no_index:
     - t
     - xt
 requires:
-  CGI::Header: 0.45
+  CGI::Header: 0.47
   Carp: 1.10
   parent: 0
   perl: 5.8.9
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/anazawa/p5-CGI-Header-PSGI
-version: 0.10
+version: 0.11
