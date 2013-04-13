@@ -5,7 +5,7 @@ use warnings;
 use parent 'CGI::Header';
 use Carp qw/croak/;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 sub new {
     my $class  = shift;
@@ -73,8 +73,8 @@ sub _as_arrayref {
 
     my @headers;
 
-    my ( $attachment, $charset, $cookie, $expires, $p3p, $target, $type )
-        = delete @header{qw/attachment charset cookie expires p3p target type/};
+    my ( $attachment, $charset, $cookies, $expires, $p3p, $target, $type )
+        = delete @header{qw/attachment charset cookies expires p3p target type/};
 
     push @headers, 'Server', $query->server_software if $nph;
     push @headers, 'Window-Target', $target if $target;
@@ -84,7 +84,7 @@ sub _as_arrayref {
         push @headers, 'P3P', qq{policyref="/w3c/p3p.xml", CP="$tags"};
     }
 
-    my @cookies = ref $cookie eq 'ARRAY' ? @{$cookie} : $cookie;
+    my @cookies = ref $cookies eq 'ARRAY' ? @{$cookies} : $cookies;
        @cookies = map { $self->_bake_cookie($_) || () } @cookies;
 
     push @headers, map { ('Set-Cookie', $_) } @cookies;
@@ -137,12 +137,14 @@ CGI::Header::PSGI - Generate PSGI-compatible response header arrayref
       my $query  = CGI::PSGI->new( $env );
       my $header = CGI::Header::PSGI->new( query => $query );
         
-      # run CGI.pm-based application
+      my $body = do {
+          # run CGI.pm-based application
+      };
 
       return [
           $header->status_code,
           $header->as_arrayref,
-          [ "Hello, World" ]
+          [ $body ]
       ];
   };
 
@@ -156,7 +158,7 @@ This module can be used to convert CGI.pm-compatible HTTP header properties
 into PSGI response header array reference. 
 
 This module requires your query class is orthogonal to a global variable
-C<%ENV>. For example, C<CGI::PSGI> adds the C<env>
+C<%ENV>. For example, L<CGI::PSGI> adds the C<env>
 attribute to CGI.pm, and also overrides some methods which refer to C<%ENV>
 directly. This module doesn't solve those problems at all.
 

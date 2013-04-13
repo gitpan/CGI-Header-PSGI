@@ -5,6 +5,7 @@ author:
 build_requires:
   CGI::PSGI: 0.15
   ExtUtils::MakeMaker: 6.59
+  Test::MockTime: 0
   Test::More: 0.98
   Test::Pod: 1.45
 configure_requires:
@@ -31,4 +32,4 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/anazawa/p5-CGI-Header-PSGI
-version: 0.11
+version: 0.12
