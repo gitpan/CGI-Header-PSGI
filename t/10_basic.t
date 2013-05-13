@@ -11,7 +11,6 @@ set_fixed_time( 1341637509 );
 
 my $header = CGI::Header::PSGI->new(
     header => {
-        '-NPH'           => 1,
         '-Status'        => '304 Not Modified',
         '-Content_Type'  => 'text/plain',
         '-Charset'       => 'utf-8',
@@ -27,7 +26,6 @@ my $header = CGI::Header::PSGI->new(
 is $header->status_code, 304;
 
 is_deeply $header->as_arrayref, [
-    'Server',              'Apache/1.3.27 (Unix)',
     'Window-Target',       'ResultsWindow',
     'P3P',                 'policyref="/w3c/p3p.xml", CP="CAO DSP LAW CURa"',
     'Set-Cookie',          'ID=123456; path=/',
